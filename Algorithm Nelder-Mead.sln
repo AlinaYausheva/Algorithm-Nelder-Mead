@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31702.278
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Algorithm Nelder-Mead", "Algorithm Nelder-Mead.csproj", "{C4F4858C-B031-452C-8A1F-7482D97EC8C8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NelderMeadTests", "..\NelderMeadTests\NelderMeadTests.csproj", "{621A3F89-113D-4E1C-87DA-2CC1DA717535}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C4F4858C-B031-452C-8A1F-7482D97EC8C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4F4858C-B031-452C-8A1F-7482D97EC8C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4F4858C-B031-452C-8A1F-7482D97EC8C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4F4858C-B031-452C-8A1F-7482D97EC8C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{621A3F89-113D-4E1C-87DA-2CC1DA717535}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{621A3F89-113D-4E1C-87DA-2CC1DA717535}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{621A3F89-113D-4E1C-87DA-2CC1DA717535}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{621A3F89-113D-4E1C-87DA-2CC1DA717535}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {54D88415-5AC7-4EFB-A6E6-1795C3B82A97}
+	EndGlobalSection
+EndGlobal
