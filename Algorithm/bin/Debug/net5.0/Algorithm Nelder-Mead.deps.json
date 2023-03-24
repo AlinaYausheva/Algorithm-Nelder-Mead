@@ -1,0 +1,41 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v5.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v5.0": {
+      "Algorithm Nelder-Mead/1.0.0": {
+        "dependencies": {
+          "MathParser.org-mXparser": "5.2.1"
+        },
+        "runtime": {
+          "Algorithm Nelder-Mead.dll": {}
+        }
+      },
+      "MathParser.org-mXparser/5.2.1": {
+        "runtime": {
+          "lib/netstandard21/MathParser.org-mXparser.dll": {
+            "assemblyVersion": "5.2.1.0",
+            "fileVersion": "5.2.1.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Algorithm Nelder-Mead/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "MathParser.org-mXparser/5.2.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-UZxx6OpGB7sv5zgGssw+8GfGImoPJbJqe8d5f3dj2+Et6V7RLLQLBdSQPmgWVHruSMXRWx6aE88XLzKzaO9n4w==",
+      "path": "mathparser.org-mxparser/5.2.1",
+      "hashPath": "mathparser.org-mxparser.5.2.1.nupkg.sha512"
+    }
+  }
+}
