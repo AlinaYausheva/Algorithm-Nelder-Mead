@@ -116,17 +116,7 @@ namespace Algorithm_Nelder_Mead
         public static void PointSelection()
         {
             points = Sort(points);
-
-            for (int i = 0; i < pointNum; i++)
-            {
-                for (int j = 0; j < argNum; j++)
-                {
-                    Console.Write(points[i].coordinate[j] + " ");
-                }
-                Console.WriteLine();
-            }
-
-
+            
             for (int k = 0; k < argNum; k++)
             {
                 Xb.coordinate[k] = points[0].coordinate[k];
