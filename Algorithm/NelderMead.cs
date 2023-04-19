@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using org.mariuszgromada.math.mxparser;
+using System;
 
 namespace Algorithm_Nelder_Mead
 {
@@ -13,8 +9,8 @@ namespace Algorithm_Nelder_Mead
         public static Function f;
         public static int argNum, pointNum;
         public static Point[] points;
-        public static Point Xb, Xw, Xg, Xc, Xr, Xs, Xe;
-        public static double Fb, Fg, Fw, Fe, Fr, Fs;
+        public static Point X_best, X_worst, X_good, X_center, X_reflection, X_squeeze, X_elongation;
+        public static double F_best, F_good, F_worst, F_elongation, F_reflection, F_squeeze;
 
         static void Swap<T>(ref T a, ref T b)
         {
@@ -25,29 +21,28 @@ namespace Algorithm_Nelder_Mead
 
         public static Point[] Sort(Point[] p)
         {
+            Point[] copyPoints = new Point[p.Length];
+            Array.Copy(p, copyPoints, p.Length);
+
             for (int i = 0; i < pointNum; i++)
             {
                 for (int j = i + 1; j < pointNum; j++)
                 {
-                    if (CalculateFunction(p[i]) > CalculateFunction(p[j]))
+                    if (CalculateFunction(copyPoints[i]) > CalculateFunction(copyPoints[j]))
                     {
                         Point a = new Point(argNum);
-                        for (int k = 0; k < argNum; k++)
-                        {
-                            a.coordinate[k] = p[i].coordinate[k];
-                            p[i].coordinate[k] = p[j].coordinate[k];
-                            p[j].coordinate[k] = a.coordinate[k];
-                        }
+                        a = copyPoints[i];
+                        copyPoints[i] = copyPoints[j];
+                        copyPoints[j] = a;
                     }
-                }
+                }                
             }
-            return p;
+            return copyPoints;
         }
 
-        public static int[] FunctionForTests(string fun, double a, double b, double g)
+        public static Point Run(string fun, double a, double b, double g)
         {
-            bool ap = false;
-            int[] vector;
+            bool approximation = false;
             alpha = a;
             beta = b;
             gamma = g;
@@ -55,148 +50,101 @@ namespace Algorithm_Nelder_Mead
             argNum = f.getArgumentsNumber();
             pointNum = argNum + 1;
 
-            vector = new int[argNum];
             BuildSimplex();
-            while (!ap)
+            while (!approximation)
             {
                 PointSelection();
                 FindingGravityCenter();
                 Reflection();
-                ap = DerectionChecking();
+                approximation = DerectionChecking();
             }
-
-            for (int i = 0; i < argNum; i++)
-            {
-                vector[i] = (int)Math.Round(Xb.coordinate[i]);
-            }
-            return vector;
-        }
-        public static void ReadInformation()
-        {
-            Console.WriteLine("Введите альфа (обычно 1):");
-            alpha = double.Parse(Console.ReadLine());//коэффициент отражения
-            Console.WriteLine("Введите бета (обычно 0,5):");
-            beta = double.Parse(Console.ReadLine());//коэффициент сжатия
-            Console.WriteLine("Введите гамма (обычно 2):");
-            gamma = double.Parse(Console.ReadLine());//коэффициент растяжения
-            Console.WriteLine("Введите функцию (пример ввода f(x1,x2)=3*x1+x2^2):");
-            string function = Console.ReadLine();
-            f = new Function(function);
-            argNum = f.getArgumentsNumber();//количество аргументов в функции
-            pointNum = argNum + 1;//количество точек
-
+            return X_best;
         }
 
         public static void BuildSimplex() //выбор точек
         {
-            Xb = new Point(argNum);
-            Xw = new Point(argNum);
-            Xg = new Point(argNum);
-            Xr = new Point(argNum);
-            Xe = new Point(argNum);
-            Xs = new Point(argNum);
+            X_best = new Point(argNum);
+            X_worst = new Point(argNum);
+            X_good = new Point(argNum);
+            X_reflection = new Point(argNum);
+            X_elongation = new Point(argNum);
+            X_squeeze = new Point(argNum);
 
             points = new Point[pointNum];
             for (int i = 0; i < pointNum; i++)
                 points[i] = new Point(argNum);
 
-            for (int i = 0; i < argNum; i++)
-                points[0].coordinate[i] = 0;
-
             for (int i = 1; i < pointNum; i++)
                 for (int j = 0; j < argNum; j++)
                 {
                     if (i == j + 1)
-                        points[i].coordinate[j] = 1;
+                        points[i].Coordinate[j] = 1;
                     else
-                        points[i].coordinate[j] = 0;
+                        points[i].Coordinate[j] = 0;
                 }
         }
 
         public static void PointSelection()
         {
             points = Sort(points);
-            
-            for (int k = 0; k < argNum; k++)
-            {
-                Xb.coordinate[k] = points[0].coordinate[k];
-                Xw.coordinate[k] = points[pointNum - 1].coordinate[k];
-                Xg.coordinate[k] = points[pointNum - 2].coordinate[k];
-            }
+
+            X_best = points[0];
+            X_worst = points[pointNum - 1];
+            X_good = points[pointNum - 2];
         }
 
         public static void FindingGravityCenter()
         {
-            Xc = new Point(argNum);
-            for (int i = 0; i < argNum; i++)
-                for (int j = 0; j < pointNum - 1; j++)
-                    Xc.coordinate[i] += points[j].coordinate[i];
+            X_center = new Point(argNum);
+            for (int j = 0; j < pointNum - 1; j++)
+                X_center = X_center + points[j];
 
-            for (int i = 0; i < argNum; i++)
-                Xc.coordinate[i] = Xc.coordinate[i] / argNum;
+            X_center = X_center / argNum;
         }
 
         public static void Reflection()
         {
-            for (int i = 0; i < argNum; i++)
-                Xr.coordinate[i] = (1 + alpha) * Xc.coordinate[i] - alpha * Xw.coordinate[i];
+            X_reflection = (1 + alpha) * X_center - alpha * X_worst;
         }
 
         public static bool DerectionChecking()
         {
-            Fr = CalculateFunction(Xr);
-            Fb = CalculateFunction(Xb);
-            Fg = CalculateFunction(Xg);
-            Fw = CalculateFunction(Xw);
+            F_reflection = CalculateFunction(X_reflection);
+            F_best = CalculateFunction(X_best);
+            F_good = CalculateFunction(X_good);
+            F_worst = CalculateFunction(X_worst);
 
-            if (Fr < Fb)
+            if (F_reflection < F_best)
             {
-                for (int i = 0; i < argNum; i++)
-                    Xe.coordinate[i] = (1 - gamma) * Xc.coordinate[i] + gamma * Xr.coordinate[i];
+                X_elongation = (1 - gamma) * X_center + gamma * X_reflection;
 
-                Fe = CalculateFunction(Xe);
-                if (Fe < Fr)
+                F_elongation = CalculateFunction(X_elongation);
+                if (F_elongation < F_reflection)
                 {
-                    for (int k = 0; k < argNum; k++)
-                    {
-                        Xw.coordinate[k] = Xe.coordinate[k];
-                        points[pointNum - 1].coordinate[k] = Xe.coordinate[k];
-
-                    }
+                    X_worst = X_elongation;
+                    points[pointNum - 1] = X_elongation;
                     return CheckConvergence();
                 }
-                if (Fr < Fe)
+                if (F_reflection < F_elongation)
                 {
-                    for (int k = 0; k < argNum; k++)
-                    {
-                        Xw.coordinate[k] = Xr.coordinate[k];
-                        points[pointNum - 1].coordinate[k] = Xr.coordinate[k];
-                    }
+                    X_worst = X_reflection;
+                    points[pointNum - 1] = X_reflection;
                     return CheckConvergence();
                 }
             }
-            if ((Fb < Fr) && (Fr < Fg))
+            if ((F_best < F_reflection) && (F_reflection < F_good))
             {
-                for (int k = 0; k < argNum; k++)
-                {
-                    Xw.coordinate[k] = Xr.coordinate[k];
-                    points[pointNum - 1].coordinate[k] = Xr.coordinate[k];
-                }
+                X_worst = X_reflection;
+                points[pointNum - 1] = X_reflection;
                 return CheckConvergence();
             }
-            if ((Fg < Fr) && (Fr < Fw))
+            if ((F_good < F_reflection) && (F_reflection < F_worst))
             {
-                Point a = new Point(argNum);
-                for (int k = 0; k < argNum; k++)
-                {
-                    a.coordinate[k] = Xw.coordinate[k];
-                    Xw.coordinate[k] = Xr.coordinate[k];
-                    Xr.coordinate[k] = a.coordinate[k];
-                }
-                Swap(ref Fw, ref Fr);
+                Swap(ref X_worst, ref X_reflection);
+                Swap(ref F_worst, ref F_reflection);
                 return Comptession();
             }
-            if (Fw < Fr)
+            if (F_worst < F_reflection)
             {
                 return Comptession();
             }
@@ -205,27 +153,19 @@ namespace Algorithm_Nelder_Mead
 
         public static bool Comptession()//6, 7, 8 шаги
         {
-            for (int i = 0; i < argNum; i++)
-                Xs.coordinate[i] = beta * Xw.coordinate[i] + (1 - beta) * Xc.coordinate[i];
-            Fs = CalculateFunction(Xs);
-            if (Fs < Fw)
+            X_squeeze = beta * X_worst + (1 - beta) * X_center;
+            F_squeeze = CalculateFunction(X_squeeze);
+            if (F_squeeze < F_worst)
             {
-                for (int k = 0; k < argNum; k++)
-                {
-                    Xw.coordinate[k] = Xs.coordinate[k];
-                    points[pointNum - 1].coordinate[k] = Xs.coordinate[k];
-                }
+                X_worst = X_squeeze;
+                points[pointNum - 1] = X_squeeze;
                 return CheckConvergence();
             }
-
-            if (Fs > Fw)
+            else if (F_squeeze > F_worst)
             {
                 for (int i = 1; i < pointNum; i++)
                 {
-                    for (int j = 0; j < argNum; j++)
-                    {
-                        points[i].coordinate[j] = Xb.coordinate[j] + (points[i].coordinate[j] - Xb.coordinate[j]) / 2;
-                    }
+                    points[i] = X_best + (points[i] - X_best) / 2;
                 }
             }
             return CheckConvergence();
@@ -237,7 +177,7 @@ namespace Algorithm_Nelder_Mead
             double check = 0;
             for (int i = 0; i < pointNum; i++)
             {
-                check += Math.Pow((CalculateFunction(points[i]) - CalculateFunction(Xc)), 2);
+                check += Math.Pow((CalculateFunction(points[i]) - CalculateFunction(X_center)), 2);
             }
             check = Math.Sqrt(check / pointNum);
             if (check < eps)
@@ -250,19 +190,21 @@ namespace Algorithm_Nelder_Mead
         public static double CalculateFunction(Point p)
         {
             for (int i = 0; i < argNum; i++)
-                f.setArgumentValue(i, p.coordinate[i]);
+                f.setArgumentValue(i, p.Coordinate[i]);
             double y = f.calculate();
             return y;
         }
 
-        public static void WriteInformation()
+        public static string WriteAnswer()
         {
-            Console.Write("f(" + Xb.coordinate[0]);
+            string ans = "";
+            ans+="f(" + X_best.Coordinate[0].ToString();
             for (int i = 1; i < argNum; i++)
             {
-                Console.Write(" ," + Xb.coordinate[i]);
+                ans+=", " + X_best.Coordinate[i].ToString();
             }
-            Console.Write(") = " + CalculateFunction(Xb));
+            ans += ") = " + CalculateFunction(X_best).ToString();
+            return ans;
         }
     }
 }
